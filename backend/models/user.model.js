@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
     {
       username:{
         type:String,
@@ -29,22 +29,22 @@ userSchema = new mongoose.Schema(
         enum:["male","female"]
       },
       followers:{
-        type:mongoose.Subject.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
       },
       following:{
-        type:mongoose.Subject.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
       },
       posts:{
-        type:mongoose.Subject.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"Post"
       },
       bookmarks:{
-        type:mongoose.Subject.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"Post"
       }
     },{timestamps:true})
 
-User = mongoose.model("User",userSchema);
+const User = mongoose.model("User",userSchema);
 export default User;

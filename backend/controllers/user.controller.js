@@ -1,9 +1,9 @@
-import bcrypt from "bcrypt.js";
+import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
 
-export const signUp=async(req,res)=>{
+export const signup=async(req,res)=>{
     try {
         const {username,email,password} = req.body;
         // check if something is missing
@@ -16,7 +16,7 @@ export const signUp=async(req,res)=>{
         }
 
         // check user is already exist or not
-        const user = await User.findBy(email);
+        const user = await User.findOne({email});
         if(user){
             return res.status(409).json({
                 message: "User is already existed",
@@ -46,7 +46,7 @@ export const signUp=async(req,res)=>{
 // login mein bss 1.check(users db hashedpassword==(do hash of password from body))
 //      2. create an obj userdetail -->which to return as res for "viewProfile"
 // 3.create token and put in cookie to remain authentication(for particular period of time(like for 1 day)) in website
-export const logIn=async(req,res)=>{
+export const login=async(req,res)=>{
     try {
         // 1.check(users db hashedpassword==(do hash of password from body))
         const {email,password} = req.body;
@@ -59,7 +59,7 @@ export const logIn=async(req,res)=>{
         }
         
         const hashing_body_password = await bcrypt.hash(password,10);
-        const user = await User.findBy(email);
+        const user = await User.findOne({email});
     
         if(hashing_body_password != user.password)
         {
@@ -96,7 +96,7 @@ export const logIn=async(req,res)=>{
 }
 
 
-export const logOut=async(req,res)=>{
+export const logout=async(req,res)=>{
     try {
         return res.cookie("token","",{maxAge:0}).json({
             message:"Logout successfully",
@@ -107,10 +107,11 @@ export const logOut=async(req,res)=>{
     }
 }
 
-export const getProfile=async(req,res)=>{
+// url.parmater mein hoga uski profile dekhna chaynge
+export const getprofile=async(req,res)=>{
     try {
-        const userid = req.params.id;
-        let user = await User.findById(userid);
+        const userid = req.params.id;  //pick id
+        let user = await User.findById(userid).select("-password");  //user dbs without password
         if(!user)
         {
             return res.status(404).json({
@@ -119,7 +120,7 @@ export const getProfile=async(req,res)=>{
             })
         }
         return res.status(200).json({
-            user,
+            user,                        // res of user dbs
             success:true
         })
     } catch (error) {
@@ -131,7 +132,7 @@ export const editprofile=async(req,res)=>{
     try {
         // picking user(whom to edit is ourself) took id from token(which is in cookie)----using middleware
         const userid = req.id;
-        const user = await User.findById(userid);
+        const user = await User.findById(userid).select("-password");
         if(!user)
         {
             return res.status(404).json({
@@ -171,7 +172,7 @@ export const editprofile=async(req,res)=>{
     }
 }
 
-export const getSuggestedUsers=async(req,res)=>{
+export const get_suggested_users=async(req,res)=>{
   try {
      const suggestedUsers = await User.find({_id:{$ne:req.id}}).select("-password");
      if(!suggestedUsers){
@@ -191,7 +192,7 @@ export const getSuggestedUsers=async(req,res)=>{
   }
 }
 
-export const followORunfollow=async(req,res)=>{
+export const follow_or_unfollow=async(req,res)=>{
     try {
         // extracting id's of both who and whom
         const who_follow_id = req.id;

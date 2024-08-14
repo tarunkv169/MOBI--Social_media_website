@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import connectdb from "./utils/db.js";   //MONGO DB CONNECTED
+import userRoute from "./routes/user.route.js"
 dotenv.config({});
 
 const app = express();
@@ -25,6 +26,8 @@ app.get("/",async(_,res)=>{
         success: true
     })
 })
+
+app.use("/api/v1/user",userRoute);
 
 app.listen(port,()=> { 
     connectdb();   //HERE IS FUNC CALL FOR MONGODB CONNECTION

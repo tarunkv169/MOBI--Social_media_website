@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const Login = () => {
@@ -16,6 +16,9 @@ const Login = () => {
 
     const [loading,setloading] = useState(false);
     
+    const navigate = useNavigate();
+
+
     const changeEventHandler=(e)=>{
         setinput({...input,[e.target.name]:e.target.value})
     }
@@ -24,7 +27,7 @@ const Login = () => {
         e.preventDefault();
         try {
             setloading(true);
-            const res = await axios.get('http://localhost:8000/api/v1/login',{
+            const res = await axios.post('http://localhost:8000/api/v1/user/login',input,{
                 headers:{
                     'Content-Type':'application/json'
                 },
@@ -32,7 +35,8 @@ const Login = () => {
             })
             
             if(res.data.success)
-            {
+            {  
+                navigate("/")
                 toast.success(res.data.message);
                 setinput({
                     email:"",

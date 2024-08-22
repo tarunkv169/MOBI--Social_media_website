@@ -5,7 +5,7 @@ import axios from "axios"
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const Signup = () => {
@@ -20,12 +20,13 @@ const Signup = () => {
   // to show loading while req is sent to server
   const [loading,setloading] = useState(false);
   
+  const navigate = useNavigate();
+
   // empty input filled with user data
   const ChangeEventHandler=(e)=>{
    setinput({...input,[e.target.name]:e.target.value})  // inserting values to make it object as input is object
   }
   
-//   const navigate = useNavigate();
   // storing data in dbs using "axios" by making api call ,,,"sooner->toast" is used to show message
   const SignUpHandler=async(e)=>{
     e.preventDefault();
@@ -42,7 +43,7 @@ const Signup = () => {
 
         if(res.data.success)
         {
-         //   navigate("http://localhost:8000/api/v1/user/signup")
+           navigate("/login")
           toast.success(res.data.message);
           setinput({
             username:"",
@@ -68,7 +69,7 @@ const Signup = () => {
              <p className='text-center text-sm'>Signup to see photos and videos of your friends</p>
           </div>
           <div>
-             <span htmlFor="username" className='font-medium'>Username</span>
+             <span className='font-medium'>Username</span>
              <Input
              type="text"
              name='username'
@@ -77,7 +78,7 @@ const Signup = () => {
              className='focus-visible:ring-transparent my-2'/>
           </div>
           <div>       
-             <span htmlFor="email" className='font-medium'>Email</span>
+             <span  className='font-medium'>Email</span>
              <Input
              type="Email"
              name='email'
@@ -86,7 +87,7 @@ const Signup = () => {
              className='focus-visible:ring-transparent my-2'/>
           </div>
           <div>
-             <span htmlFor="password" className='font-medium'>Password</span>
+             <span  className='font-medium'>Password</span>
              <Input
              type="Password"
              name='password'

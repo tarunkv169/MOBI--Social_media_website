@@ -1,10 +1,16 @@
+import { Outlet } from "react-router-dom";
+import Leftsidebar from "./Leftsidebar";
 
 
 const MainLayot = () => {
   return (
     <div>
-       sidebar
+        <Leftsidebar/>
+        <div>
+            <Outlet/>
+        </div>
     </div>
+    
   )
  
 };

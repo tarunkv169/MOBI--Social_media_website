@@ -1,5 +1,5 @@
 import './App.css'
-import Home from './components/home'
+// import Home from './components/home'
 import Login from './components/Login'
 import MainLayot from './components/MainLayot'
 import Signup from './components/Signup'
@@ -10,10 +10,10 @@ const browserRouter = createBrowserRouter([
     path:"/",
     element:<MainLayot/>,
     children:[
-      {
-        path:"/",
-        element:<Home/>
-      }
+      // {
+      //   path:"/",
+      //   element:<Home/>
+      // }
     ]
   },
   {

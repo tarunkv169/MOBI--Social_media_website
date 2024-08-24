@@ -5,8 +5,8 @@
   "elements": [
     {
       "type": "text",
-      "version": 159,
-      "versionNonce": 886480121,
+      "version": 160,
+      "versionNonce": 402595322,
       "isDeleted": false,
       "id": "IvmnIa3XvmUuIw5PJ2YqB",
       "fillStyle": "solid",
@@ -26,7 +26,7 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1724248315741,
+      "updated": 1724484811978,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -37,12 +37,12 @@
       "containerId": null,
       "originalText": "11/aug/24 - (Schema's)",
       "lineHeight": 1.25,
-      "baseline": 5
+      "baseline": 3
     },
     {
       "type": "text",
-      "version": 2700,
-      "versionNonce": 522750743,
+      "version": 2701,
+      "versionNonce": 1099257510,
       "isDeleted": false,
       "id": "y60W5fKIn5rkCjLmD0VkI",
       "fillStyle": "solid",
@@ -62,7 +62,7 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1724248315741,
+      "updated": 1724484811985,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -73,12 +73,12 @@
       "containerId": null,
       "originalText": "0. we will use input,label,button or many more of vite (install by npm package) in our ui> folder\n\n1.  center the inner of div ---- flex items-center w-screen h-screen justify-center\n\n2. shadow the form ---- shadow-lg\n   column-wise the form ---- flex flex-col gap-5 p-8\n\n    3. customize border ---\n\n4. customize & center text ---\n\n5. usestate---\n\n6. axios(A,D,C) --- to do \"api call\" from  \"frontend\"-------->\"backend\"\n\n7. sooner/Toast----used to show the notification\n\n8. react router dom---for routing b/w components\n9. lucid react---for icons\n10. navigate---for routing b/w components\n11. some imp css\n12. func call in------- div\"onChange etch\"---- in react doesnot need  \"()\"--> onChange(loginhandler)     /////// ✨if want to send args then do ------onChange={   ()=>loginhandler(tarun)  }\n\n13.  CORS, Preflight Request, OPTIONS Method------>Access to XMLHttpRequest at 'http://localhost:8000/api/v1/user/signup' from origin 'http://localhost:5173' has been blocked by CORS policy\n     \n     when  \"SORS\" (same origin resource sharing) ----> no issue,,, A.com  is accessing  A.com resourses\n\n     when  \"DORS\" (different origin resource sharing)---> issue,,, A.com is try to access B.com resoures -----> here is need to send \"PRE-FLIGHT REQ\"(req before actual req) to get \"RES\" from B.com, which includes( 1. ACAO-access control allow origin('*')  2. ACAM-access control allow method('get', ' post' etc)  )\n                                                                                                       -----> if both (ACAO & ACAM) are allowed then A.com  can access B.com\n\n\n14. i think extension is not working ''' not suggesting react suggestions ,,, i did this \n\n\n15. in react 17 no need to import react \n\n6. react router dom set up using \"createbrowserRouter\" which use ( [  { [ ]  }, {} ] ) ------> stored in instance --------> which is called in return div( <RouterProvider router={instance} />\n\n\n17. there is also a \"Link\" of react-router-dom    and  \"Loader2\"  of lucid-react------> lucid-react contains icons",
       "lineHeight": 1.25,
-      "baseline": 271
+      "baseline": 269
     },
     {
       "type": "embeddable",
-      "version": 584,
-      "versionNonce": 541588577,
+      "version": 585,
+      "versionNonce": 1716155514,
       "isDeleted": false,
       "id": "VJNefe1iLcN_lUpshtCy3",
       "fillStyle": "solid",
@@ -100,15 +100,15 @@
         "type": 3
       },
       "boundElements": [],
-      "updated": 1724267902410,
+      "updated": 1724484811890,
       "link": "https://youtu.be/nYhGCby2bXA?feature=shared",
       "locked": false,
       "validated": true
     },
     {
       "type": "embeddable",
-      "version": 195,
-      "versionNonce": 1703753263,
+      "version": 196,
+      "versionNonce": 1361094694,
       "isDeleted": false,
       "id": "IRdAyIbQGfBUIzng4uUm7",
       "fillStyle": "solid",
@@ -130,7 +130,7 @@
         "type": 3
       },
       "boundElements": [],
-      "updated": 1724267902410,
+      "updated": 1724484811890,
       "link": "https://youtu.be/yMVpolHRMPk?feature=shared",
       "locked": false,
       "validated": true
@@ -214,8 +214,8 @@
     },
     {
       "type": "text",
-      "version": 230,
-      "versionNonce": 851424153,
+      "version": 231,
+      "versionNonce": 85806778,
       "isDeleted": false,
       "id": "GjMaki70CLmcqWSX_FqhG",
       "fillStyle": "solid",
@@ -235,7 +235,7 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1724248315741,
+      "updated": 1724484811985,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -246,12 +246,12 @@
       "containerId": null,
       "originalText": "21/aug/24 - (Mainlayot >>> leftsidebar and feed >> posts)",
       "lineHeight": 1.25,
-      "baseline": 5
+      "baseline": 3
     },
     {
       "type": "text",
-      "version": 1042,
-      "versionNonce": 409671713,
+      "version": 1043,
+      "versionNonce": 1630507494,
       "isDeleted": false,
       "id": "AGvenTAbIpJplgweDV9Yn",
       "fillStyle": "solid",
@@ -271,7 +271,7 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1724267903000,
+      "updated": 1724484811986,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -282,7 +282,7 @@
       "containerId": null,
       "originalText": "1. react-router-dom :---\n     1.  createbrouserRouter\n     2. RouterProvider\n     3. Link\n     4. UseNavigate\n     5. outlet :   An <Outlet> should be used in parent route elements to render their child route elements. This allows nested UI to show up when child routes are rendered.\n                         \n                     in >> APP.JSX\n                          \n                           const browserRouter = createBrowserRouter(\n                           [\n                               { \n                                  path    : \"/\",\n                                  element  : <MainLayot/>,\n\n                                  children  :\n                                   [\n                                        {\n                                            path     : \"/\",\n                                            element  : <Home/>\n                                        },\n                                        {\n                                            path     : \"/profile\",\n                                            element  : <Profile/>\n                                        }\n                                    ]\n                               },",
       "lineHeight": 1.25,
-      "baseline": 182
+      "baseline": 180
     },
     {
       "type": "arrow",
@@ -520,8 +520,8 @@
     },
     {
       "type": "text",
-      "version": 397,
-      "versionNonce": 1233827439,
+      "version": 398,
+      "versionNonce": 951543674,
       "isDeleted": false,
       "id": "EK_8zgxHCKKwRjFmJMYxT",
       "fillStyle": "solid",
@@ -541,7 +541,7 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1724267903001,
+      "updated": 1724484811986,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -552,12 +552,12 @@
       "containerId": null,
       "originalText": "parent--\nso--fixed",
       "lineHeight": 1.25,
-      "baseline": 11
+      "baseline": 10
     },
     {
       "type": "text",
-      "version": 325,
-      "versionNonce": 1920297985,
+      "version": 326,
+      "versionNonce": 1584424230,
       "isDeleted": false,
       "id": "jYH7j-7-oGQToNl4TFxSF",
       "fillStyle": "solid",
@@ -577,7 +577,7 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1724267903002,
+      "updated": 1724484811986,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -588,12 +588,12 @@
       "containerId": null,
       "originalText": "chilren will \nrender on click",
       "lineHeight": 1.25,
-      "baseline": 11
+      "baseline": 10
     },
     {
       "type": "text",
-      "version": 319,
-      "versionNonce": 719851663,
+      "version": 320,
+      "versionNonce": 1259366458,
       "isDeleted": false,
       "id": "lg9B0Bvg8bZ6XpEQWGp6d",
       "fillStyle": "solid",
@@ -613,7 +613,7 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1724267903003,
+      "updated": 1724484811987,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -624,12 +624,12 @@
       "containerId": null,
       "originalText": "chilren will \nrender on click",
       "lineHeight": 1.25,
-      "baseline": 11
+      "baseline": 10
     },
     {
       "type": "text",
-      "version": 353,
-      "versionNonce": 1674200033,
+      "version": 354,
+      "versionNonce": 2058670182,
       "isDeleted": false,
       "id": "v8Duuo-BJO8AoD9pPQKCd",
       "fillStyle": "solid",
@@ -658,7 +658,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1724267903004,
+      "updated": 1724484811987,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -669,7 +669,7 @@
       "containerId": null,
       "originalText": "to render childs\nneed --\"outlet\"",
       "lineHeight": 1.25,
-      "baseline": 11
+      "baseline": 10
     },
     {
       "type": "line",
@@ -972,8 +972,8 @@
     },
     {
       "type": "text",
-      "version": 448,
-      "versionNonce": 2008813911,
+      "version": 449,
+      "versionNonce": 1410027770,
       "isDeleted": false,
       "id": "y_P--8tpUsM770UtMqHLF",
       "fillStyle": "solid",
@@ -998,7 +998,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1724249067375,
+      "updated": 1724484811987,
       "link": null,
       "locked": false,
       "fontSize": 5.4584021633158795,
@@ -1009,7 +1009,7 @@
       "containerId": null,
       "originalText": "not to messy this we will create comp \" <leftsidebar/> \" --> here are all the childrens axios is called",
       "lineHeight": 1.25,
-      "baseline": 5
+      "baseline": 3
     }
   ],
   "appState": {

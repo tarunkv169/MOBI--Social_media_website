@@ -1,8 +1,21 @@
+import { Outlet } from "react-router-dom";
+import Feed from "./Feed";
+import Rightsidebar from "./Rightsidebar";
 
 
-const home = () => {
-  return <div>home</div>;
+
+const Home = () => {
+  return (
+    <div className="flex">
+        <div className="flex-grow">
+          <Feed/>
+          <Outlet/>
+        </div>
+       <Rightsidebar/>
+
+    </div>   
+
+  )
 };
 
-export default home;
-
+export default Home;

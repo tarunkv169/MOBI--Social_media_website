@@ -17,8 +17,8 @@ app.use(express.urlencoded({extended:true})); //parse the forms
 app.use(express.json());     //parse the json
 app.use(cookieParser());   // parse the cookies
 const corsOptions={
-    option:"http://localhost:5713",
-    credentials: true
+    origin:"http://localhost:5173",
+    credentials: true                    // true :- i.e we allow both ACAO and ACAM  in response to preflight req
 }
 app.use(cors(corsOptions))
 

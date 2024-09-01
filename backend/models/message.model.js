@@ -9,11 +9,11 @@ const messageSchema=new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
-    text:{
+    message:{
         type:String,
         required:true
     }
 },{timestamps:true})
-
+    
 const Message = mongoose.model("Message",messageSchema);
 export default Message;

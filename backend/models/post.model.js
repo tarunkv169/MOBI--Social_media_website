@@ -10,18 +10,18 @@ const postSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    likes:{
+    likes:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
-    },
+    }],
     caption:{
         type:String,
         default:""
     },
-    comments:{
+    comments:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Comment"
-    }
+    }]
 },{timestamps:true})
 
 const Post = mongoose.model("Post",postSchema);

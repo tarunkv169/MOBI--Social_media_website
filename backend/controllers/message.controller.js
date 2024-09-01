@@ -1,5 +1,5 @@
-import Conversation from "../models/conversation.model";
-import Message from "../models/message.model";
+import Conversation from "../models/conversation.model.js";// .js is must in import
+import Message from "../models/message.model.js";
 
 export const sendMessage=async(req,res)=>{
     try {
@@ -48,8 +48,8 @@ export const sendMessage=async(req,res)=>{
 
 export const getMessage=async(req,res)=>{
     try {
-        const recieverId = req.id;
-        const senderId = req.params.id;
+        const senderId = req.id;
+        const recieverId = req.params.id;
     
         let conversation = await Conversation.find({
             participants:{$all:[senderId,recieverId]}

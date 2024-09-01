@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
-import User from "../models/user.model.js";
+import User from "../models/user.model.js";// .js is must in import
 import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
+import getDataUri from "../utils/dataUri.js";
+import Post from "../models/post.model.js";
+
 
 export const signup=async(req,res)=>{
     try {
@@ -25,7 +28,7 @@ export const signup=async(req,res)=>{
         }
         
         //hashedpassword before creating db
-        const hashedpassword = await bcrypt(password,10);
+        const hashedpassword = await bcrypt.hash(password,10);
         //create db
         await User.create({
             username: username,
@@ -58,18 +61,51 @@ export const login=async(req,res)=>{
             })
         }
         
-        const hashing_body_password = await bcrypt.hash(password,10);
+        
         const user = await User.findOne({email});
-    
-        if(hashing_body_password != user.password)
+        if(!user)
+        {
+            return res.status(400).json({
+                message:"User not found",
+                status:false
+            })
+        }
+
+        const isPasswordMatch = await bcrypt.compare(password,user.password);
+
+        if(!isPasswordMatch)
         {
             return res.status(404).json({
-                message:"Invalid Credentials",
+                message:"Incorrect email or password",
                 success: false
             })
         }
+
+        // 2.create token and put in cookie to remain authentication(for particular period of time(like for 1 day)) in website
+         const token = await jwt.sign({userId: user._id},process.env.TOKEN_SEC_KEY,{expiresIn:"1d"});
         
-        // 2. create an obj userdetail -->which to return as res for "viewProfile"
+
+        // 3.. create an obj userdetail -->which to return as res for "viewProfile"
+
+              // we r not getting post related to login user from anywhere.....so user.posts creds need to populate with posts
+              const populateposts = await Promise.all( 
+                    (user.posts || []).map(async(postId)=>
+                                            {
+                                                const posts = await Post.findById(postId);  //this give all and every post using Post Schema
+                                                // but we need only user's posts
+                                                if(posts.author.equals(user._id))
+                                                {
+                                                     return posts;
+                                                }
+                                                else{
+                                                    return null;
+                                                }
+                                                    
+                                            })
+                                                )
+
+
+
         const userDetail = {       // this is return in res
             _id:user._id,
             username:user.username,
@@ -79,11 +115,11 @@ export const login=async(req,res)=>{
             gender:user.gender,
             followers:user.followers,
             following:user.following,
-            posts:user.posts
+            posts:populateposts             // here is need to populate post---as we r not getting it from anywhere
+                                    // need to show all post related to login user
         }
      
-        // 3.create token and put in cookie to remain authentication(for particular period of time(like for 1 day)) in website
-        const token = await jwt.sign({userId: user._id},process.env.TOKEN_SEC_KEY,{expiresIn:"1d"});
+       
         return res.cookie("token",token,{httpOnly:true, sameSite:"strict", maxAge:1*24*60*60*1000}).json({
             message: `Welcome back ${user.username}`,
             success: true,
@@ -150,11 +186,12 @@ export const editprofile=async(req,res)=>{
           let cloudinary_response;
           if(profilePicture)
           {
-            const file_uri = getDataUri(profilePicture);
-            cloudinary_response = cloudinary.uploader.upload(file_uri);
+            const file_uri = await getDataUri(profilePicture);
+            cloudinary_response = await cloudinary.uploader.upload(file_uri);
           }
 
           // overwritten in db
+          // here we r just editing(need to use ".save()") ...not creating db--in create we use "User.create()"
           if(bio) user.bio = bio;
           if(gender) user.gender = gender;
           if(profilePicture) user.profilePicture = cloudinary_response.secure_url;
@@ -216,14 +253,18 @@ export const follow_or_unfollow=async(req,res)=>{
             })
         }
 
+                // Ensure 'following' and 'followers' arrays are initialized
+                who_follow_user.following = who_follow_user.following || [];
+                whom_follow_user.followers = whom_follow_user.followers || [];
+
         //check already followed or not---who follow (user) ke dbs mein following mein whom follow ki id hai ke nhi ---T/F
-        let isfollowing = who_follow_user.following.includes(whom_follow_id);
+        const isfollowing = who_follow_user.following?.includes(whom_follow_id);
         if(isfollowing)
         {
             //hai --then we clicked for unfollow--so do unfollow
             await Promise.all([
                 User.updateOne({_id:who_follow_id},{$pull:{following:whom_follow_id}}),
-                User.updateOne({_id:whom_follow_id},{$pull:{followers:who_follow_id}})
+                User.updateOne({_id:whom_follow_id},{$pull:{followers:who_follow_id}}),
             ])
 
             return res.status(200).json({
@@ -235,7 +276,7 @@ export const follow_or_unfollow=async(req,res)=>{
             //nahi --then follow
             await Promise.all([
                 User.updateOne({_id:who_follow_id},{$push:{following:whom_follow_id}}),
-                User.updateOne({_id:whom_follow_id},{$push:{followers:who_follow_id}})
+                User.updateOne({_id:whom_follow_id},{$push:{followers:who_follow_id}}),
             ])
 
             return res.status(200).json({

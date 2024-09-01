@@ -1,65 +1,93 @@
 import sharp from "sharp";
-import User from "../models/user.model";
-import cloudinary from "../utils/cloudinary";
-import Post from "../models/post.model";
-import Comment from "../models/comment.model";
+import User from "../models/user.model.js"; // .js is must in import
+import cloudinary from "../utils/cloudinary.js";
+import Post from "../models/post.model.js";
+import Comment from "../models/comment.model.js";
 
-export const addnewpost=async(req,res)=>{
+export const addnewpost = async (req, res) => {
     try {
+
+
         // ✨1. user from token
-        const {authorid} = req.id;  
+        const authorid = req.id;  // Assuming req.id contains the author ID
         
-        // ✨2. image from pc_file_explorer using multer(power of uploadation)---multer pc ke file_explorer se uthane mein madd krta hai
+
+
+
+        // ✨2. image from pc_file_explorer using multer
         const image = req.file;   
-        //optimize if high resolution img
-        const optimizedimagebuffer = await sharp(image.buffer)
-                               .resize({width:800,height:800,fit:'inside'})
-                               .toFormat('jpeg',{quality:80})
-                               .toBuffer()   //this at end make buffer of image
+        if (!image) {
+            return res.status(400).json({ message: "No image file uploaded", success: false });
+        }
+        // Optimize image
+        const optimizedImageBuffer = await sharp(image.buffer)
+            .resize({ width: 800, height: 800, fit: 'inside' })
+            .toFormat('jpeg', { quality: 80 })
+            .toBuffer();
+        
+        const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString('base64')}`;
+        const cloudinaryResponse = await cloudinary.uploader.upload(fileUri);
+
+
+
+
+        // ✨3. caption
+        const caption = req.body.caption; // Assuming caption is directly a property in req.body
+        if (!caption) {
+            return res.status(400).json({ message: "Caption is required", success: false });
+        }
+
+
+
+
+        // Create the post
+        const post = await Post.create({
+            author: authorid,
+            image: cloudinaryResponse.secure_url,
+            caption,
+            likes: [],
+            comments: []
+        });
     
-        const file_uri = `data:image/jpeg;base64,${(await optimizedimagebuffer).toString('base64')}`;
-        const cloudinary_response = await cloudinary.uploader.upload(file_uri);
-    
-        // ✨3. caption 
-        const caption = req.body;
-    
-        // using (✨1,✨2,✨3)--we created the post
-        const post = Post.create({
-            author:authorid,
-            image:cloudinary_response.secure_url,
-            caption: caption
-        })
-    
-        // 🕎schema's which include post as credentials-----add post_id or post in thats schema of (login user only)
+
+
+        // Update user posts
         const user = await User.findById(authorid);
-        if(user)
-        {
-            user.posts.push(post_id);  // we do change in user dbs----so need to save
+        if (user) {
+            if (!user.posts) {
+                user.posts = [];
+            }
+            user.posts.push(post._id);
             await user.save();
         }
-    
-        // 🍾instead of authorid in author of post ------we will include all details of author(expect password)--details can be needed any time
-        await post.populate({path:"author",select:"-password"});
-    
-        // 🔄️as we have do some changes ....we need to show on front(as res)---what have changed
+
+        // Populate post author details
+        await post.populate({ path: "author", select: "-password" })
+
+        // Return success response
         return res.status(200).json({
-            message:"Post Added Successfully",
-            success:true,
+            message: "Post Added Successfully",
+            success: true,
             post
-        })
+        });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({
+            message: "Server Error",
+            success: false,
+            error: error.message
+        });
     }
+};
 
-}
 
 export const getuserposts=async(req,res)=>{
     try {
          const posts = await Post.find({author:req.id}).sort({createdAt:-1})  // posts ko increasing order mein sort krdo
-                                                       .populate({path:"author",select:'username,profilePicture'})  //post ke uper author ki --dp and name show krne
+                                                       .populate({path:"author",select:'username profilePicture'})  //post ke uper author ki --dp and name show krne
                                                        .populate({path:"comments"}).sort({createdAt:-1})
-                                                                                   .populate({path:"author",select:'username,profilePicture'}) 
+                                                                                   .populate({path:"author",select:'username profilePicture'}) 
          return res.status(200).json({
             success:true,
             posts
@@ -72,9 +100,9 @@ export const getuserposts=async(req,res)=>{
 export const getallposts=async(req,res)=>{
     try {
         const posts = await Post.find().sort({createdAt:-1})
-                                       .populate({path:"author",select:'username,profilePicture'})
+                                       .populate({path:"author",select:'username profilePicture'})
                                        .populate({path:"comments"}).sort({createdAt:-1})
-                                                                   .populate({path:"author",select:'username,profilePicture'})
+                                                                   .populate({path:"author",select:'username profilePicture'})
 
         return res.status(200).json({
             success:true,
@@ -195,33 +223,36 @@ export const getcomments_ofpost=async(req,res)=>{
 export const deletepost=async(req,res)=>{
 
    try {
+    // 1️⃣post to delete
+        const post_id = req.params.id;
+        const post = await Post.findById(post_id);
+        if(!post)
+        {
+            return res.status(404).json({
+                message:"Post not found",
+                success:false
+            })
+        }
     
-    const post_id = req.params.id;
-    const post = await Post.findById(post_id);
-    if(!post)
-    {
-        return res.status(404).json({
-            message:"Post not found",
-            success:false
-        })
-    }
+        // user is auth to delete post
+        const who_delete_id = req.id;
+        if(Post.author.toString() !== who_delete_id)
+        {
+            return res.status(404).json({
+                message:"User not authenticated",
+                success:false
+            })
+        }
+    
+        await Post.findByIdAndDelete(post_id);
 
-    const who_delete_id = req.id;
-    if(Post.author.toString() !== who_delete_id)
-    {
-        return res.status(404).json({
-            message:"User not authenticated",
-            success:false
-        })
-    }
+    // 2️⃣delete post in user dbs
+        let who_delete_user = findById(who_delete_id);
+        who_delete_user.posts = await who_delete_user.posts.filter(id=>id.toString()!==post_id);
+        await who_delete_user.save();
 
-    await Post.findByIdAndDelete(post_id);
-
-    let who_delete_user = findById(who_delete_id);
-    who_delete_user.posts = await who_delete_user.posts.filter(id=>id.toString()!==post_id);
-    await who_delete_user.save();
-
-    await Comment.deleteMany({createdAt:post_id})
+    // 3️⃣delete all post related comments from dbs
+        await Comment.deleteMany({createdAt:post_id})
 
     return res.status(200).json({
         message:"Post deleted",

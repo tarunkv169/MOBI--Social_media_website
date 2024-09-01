@@ -1,35 +1,81 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Dialog, DialogContent, DialogHeader } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import PropTypes from 'prop-types';
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { useRef, useState } from "react";
 import { readFileAsDataURL } from "@/lib/utils";
 import ImagePreviowdialog from "./ImagePreviowdialog";
+import { toast } from "sonner";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+import { useDispatch, useSelector} from "react-redux";
+import { setPostUser } from "@/redux/postSlice";
+
+
 
 const CreatePost = ({ open, setOpen }) => {
 
     const ImageRef = useRef("");
+
+    const [file,setFile] = useState("");
     const [imagePreview, setImagePreview] = useState("");
     const [caption,setCaption] = useState("");
 
-    const [imageOpen, setImageOpen] = useState(false)
+    const [imageOpen, setImageOpen] = useState(false);
+
+    const [loading,setLoading] = useState(false);
+
+    const dispatch = useDispatch();
+    const {posts} = useSelector(store=>store.post);  // need of {} as not default export
 
     const fileChangeHandler = async (e) => {
+        e.preventDefault();
         const newfile = e.target.files?.[0];
 
         if (newfile) {
+            setFile(newfile);
             const dataUrl = await readFileAsDataURL(newfile);
             setImagePreview(dataUrl);
         }
     };
 
-    // const CreatePostHandler=(e)=>{
+    const CreatePostHandler = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("caption", caption.trim()? caption :"_");
+        if (imagePreview) formData.append("image", file);
         
-    // }
+        try { 
+            setLoading(true);
+            const res = await axios.post("http://localhost:8000/api/v1/post/addpost", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                withCredentials: true
+            });
+
+            if(res.data.success)
+                {
+                    dispatch(setPostUser([res.data.post,...posts])) // look in dbs of addpost what u return res.data...look there...yes ..i return with post name
+                    toast.success(res.data.message);      // ✨here dispatch new post and store in store 
+                    setOpen(false);                               // ✨from <useGetAllPosts/> we dispatch all posts and store it in store
+                }                                                       // ✨total posts are useselector by <Posts/>
+
+
+        } catch (error) {
+            console.error("Post creation failed:", error.message);
+            toast.error(error.response?.data?.message || "An error occurred. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const CancelPostHandler=()=>{
         setImagePreview("");
+        setFile(null)
     }
 
     const handleDrop = async (e) => {
@@ -51,7 +97,9 @@ const CreatePost = ({ open, setOpen }) => {
         <div>
             <Dialog open={open} setOpen={setOpen}>
                 <DialogContent onInteractOutside={() => setOpen(false)}>
-                    <DialogHeader className="text-center font-semibold flex items-center border-b">Create New Post</DialogHeader>
+                    <DialogTitle className="text-center font-semibold flex items-center border-b">
+                        Create New Post
+                    </DialogTitle>
 
                     <div className="flex items-center gap-3">
                         <Avatar>
@@ -90,15 +138,32 @@ const CreatePost = ({ open, setOpen }) => {
                             </div>
                     }
 
+
                     <input ref={ImageRef} onChange={fileChangeHandler} type="file" className="hidden" />
+
+
                     {
                         imagePreview ?
-                        <div className="flex items-center gap-2 justify-evenly">
-                             <Button className="cursor-pointer w-full bg-[#ED4950] hover:bg-[#ED4972] " onClick={CancelPostHandler}>Cancel</Button>
-                             <Button className="w-full bg-[#258bcf] hover:bg-[#0095F6] " >Post</Button>
-                        </div>
+                        (
+                           <div className="flex items-center gap-2 justify-evenly">
+                                <Button className="cursor-pointer w-full bg-[#ED4950] hover:bg-[#ED4972] " onClick={CancelPostHandler}>Cancel</Button>
+                                {loading ?
+                                   ( <Button>
+                                      <Loader2 className="mr-2 w-4 h-4 animate-spin"/>
+                                      Please wait
+                                    </Button>
+                                   )
+                                   :
+                                   (
+                                   <Button type="submit" className="w-full bg-[#258bcf] hover:bg-[#0095F6]" onClick={CreatePostHandler} >Post</Button>
+                                   )
+                                }
+                           </div>
+                        )
                         :
+                        (
                         <Button onClick={() => { ImageRef.current.click() }} className="w-fit mx-auto bg-[#258bcf] hover:bg-[#0095F6]">Select from Computer</Button>
+                        )
                     }
 
                    

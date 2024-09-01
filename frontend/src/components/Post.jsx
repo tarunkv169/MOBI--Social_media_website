@@ -5,8 +5,10 @@ import { Button } from "./ui/button";
 import { FaRegHeart } from "react-icons/fa";
 import Commentdialog from "./Commentdialog";
 import { useState } from "react";
+import PropTypes from 'prop-types'; 
 
-const Post = () => {
+
+const Post = ({post}) => {
 
    const [text,settext] = useState("");
 
@@ -30,11 +32,11 @@ const Post = () => {
 
          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-               <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
-               </Avatar>
-               <span>Username</span>
+                  <Avatar>
+                     <AvatarImage src={post.author.profilePicture} />
+                     <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+               <span>{post.author.username}</span>
             </div>
             <Dialog>
                <DialogTrigger>
@@ -53,7 +55,7 @@ const Post = () => {
 
          <img 
          className="rounded-sm w-full my-2 aspect-square object-cover"
-         src="https://th.bing.com/th/id/OIP.92xngI7-q72ChW8r30bJqwHaEK?rs=1&pid=ImgDetMain" 
+         src={post.image} 
          alt="post" />
          
 
@@ -69,8 +71,8 @@ const Post = () => {
 
          <span className="font-medium block mb-2">1k likes</span>
          <p>
-            <span className="font-medium mr-2">Username</span>
-            caption
+            <span className="font-medium mr-2">{post.author.username}</span>
+            {post.caption}
          </p>
 
 
@@ -96,4 +98,14 @@ const Post = () => {
    )
 };
 
+Post.propTypes = {
+   post: PropTypes.shape({
+      author: PropTypes.shape({
+         profilePicture: PropTypes.string.isRequired,
+         username: PropTypes.string.isRequired
+      }).isRequired,
+      image: PropTypes.string.isRequired,
+      caption: PropTypes.string.isRequired
+   }).isRequired
+};
 export default Post;

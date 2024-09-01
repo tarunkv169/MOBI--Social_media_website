@@ -28,6 +28,7 @@ const CreatePost = ({ open, setOpen }) => {
 
     const dispatch = useDispatch();
     const {posts} = useSelector(store=>store.post);  // need of {} as not default export
+    const {user}=useSelector(store=>store.auth);
 
     const fileChangeHandler = async (e) => {
         e.preventDefault();
@@ -44,7 +45,7 @@ const CreatePost = ({ open, setOpen }) => {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append("caption", caption.trim()? caption :"_");
+        formData.append("caption", caption.trim()? "_"+caption :"_");
         if (imagePreview) formData.append("image", file);
         
         try { 
@@ -61,7 +62,11 @@ const CreatePost = ({ open, setOpen }) => {
                     dispatch(setPostUser([res.data.post,...posts])) // look in dbs of addpost what u return res.data...look there...yes ..i return with post name
                     toast.success(res.data.message);      // ✨here dispatch new post and store in store 
                     setOpen(false);                               // ✨from <useGetAllPosts/> we dispatch all posts and store it in store
+                    setImagePreview("");
+                    setCaption("")
+                    setFile("")
                 }                                                       // ✨total posts are useselector by <Posts/>
+
 
 
         } catch (error) {
@@ -75,7 +80,7 @@ const CreatePost = ({ open, setOpen }) => {
 
     const CancelPostHandler=()=>{
         setImagePreview("");
-        setFile(null)
+        setFile("")
     }
 
     const handleDrop = async (e) => {
@@ -103,16 +108,16 @@ const CreatePost = ({ open, setOpen }) => {
 
                     <div className="flex items-center gap-3">
                         <Avatar>
-                            <AvatarImage src="https://github.com/shadcn.png" />
+                            <AvatarImage src={user?.profilePicture} />
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h1 className="font-semibold text-xs">Username</h1>
-                            <span className="text-gray-600 text-xs">bio here....</span>
+                            <h1 className="font-semibold text-xs">{user?.username}</h1>
+                            <span className="text-gray-600 text-xs">{user?.bio}</span>
                         </div>
                     </div>
 
-                    <Textarea value={caption} onChange={(e)=>{setCaption(e.target.value)}} className="focus-visible:ring-transparent border-none" placeholder="Write a caption...."  />
+                    <Textarea value={caption} onChange={(e)=>{setCaption(e.target.value)}} className="focus-visible:ring-transparent border-none bg-gray-300" placeholder="Write a caption...."  />
 
                     {
                         imagePreview ?

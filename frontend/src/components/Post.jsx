@@ -6,6 +6,7 @@ import { FaRegHeart } from "react-icons/fa";
 import Commentdialog from "./Commentdialog";
 import { useState } from "react";
 import PropTypes from 'prop-types'; 
+import { useSelector } from "react-redux";
 
 
 const Post = ({post}) => {
@@ -13,6 +14,8 @@ const Post = ({post}) => {
    const [text,settext] = useState("");
 
    const [open,setOpen] = useState(false);
+
+   const user = useSelector(store=>store.auth.user);
 
    const onChangeHandler=(e)=>{
       //put change value into const and check it is empty or not
@@ -33,10 +36,10 @@ const Post = ({post}) => {
          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
                   <Avatar>
-                     <AvatarImage src={post.author.profilePicture} />
+                     <AvatarImage src={post.author?.profilePicture} />
                      <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
-               <span>{post.author.username}</span>
+               <span>{post.author?.username}</span>
             </div>
             <Dialog>
                <DialogTrigger>
@@ -46,7 +49,7 @@ const Post = ({post}) => {
                   <div className="flex flex-col items-center text-sm text-center">
                      <Button variant="ghost" className="cursor-pointer w-fit text-[#ED4956] font-bold">Unfollow</Button>
                      <Button variant="ghost" className="cursor-pointer w-fit ">Add to favourites</Button>
-                     <Button variant="ghost" className="cursor-pointer w-fit ">Delete</Button>
+                     {user && user._id === post.author._id && <Button variant="ghost" className="cursor-pointer w-fit ">Delete</Button>}
                   </div>
                </DialogContent>
             </Dialog>
@@ -69,9 +72,9 @@ const Post = ({post}) => {
          </div>
 
 
-         <span className="font-medium block mb-2">1k likes</span>
+         <span className="font-medium block mb-2">{post?.likes?.length || 0}  likes</span>
          <p>
-            <span className="font-medium mr-2">{post.author.username}</span>
+            <span className="font-medium mr-2">{post.author?.username}</span>
             {post.caption}
          </p>
 
@@ -98,14 +101,20 @@ const Post = ({post}) => {
    )
 };
 
+// Post.propTypes = {
+//    post: PropTypes.shape({
+//       author: PropTypes.shape({
+//          profilePicture: PropTypes.string.isRequired,
+//          username: PropTypes.string.isRequired
+//       }).isRequired,
+//       image: PropTypes.string.isRequired,
+//       caption: PropTypes.string.isRequired
+//    }).isRequired
+// };
+
 Post.propTypes = {
-   post: PropTypes.shape({
-      author: PropTypes.shape({
-         profilePicture: PropTypes.string.isRequired,
-         username: PropTypes.string.isRequired
-      }).isRequired,
-      image: PropTypes.string.isRequired,
-      caption: PropTypes.string.isRequired
-   }).isRequired
-};
+   
+   post: PropTypes.func.isRequired,
+ };
+ 
 export default Post;

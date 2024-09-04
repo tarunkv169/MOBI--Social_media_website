@@ -45,7 +45,7 @@ const Leftsidebar = () => {
     }
 
     // picking up userDetails from store of redux-toolkit  
-    const user = useSelector((store)=>store.auth.user)
+    const user = useSelector((store)=>store.auth.user)  // either look 
     
     // arr of objs
      const sidebarItems = 

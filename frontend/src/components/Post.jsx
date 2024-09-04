@@ -2,11 +2,14 @@ import {  Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { FaRegHeart } from "react-icons/fa";
+import { FaRegHeart,FaHeart } from "react-icons/fa";
 import Commentdialog from "./Commentdialog";
 import { useState } from "react";
 import PropTypes from 'prop-types'; 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import axios from "axios";
+import { setPostUser } from "@/redux/postSlice";
 
 
 const Post = ({post}) => {
@@ -16,6 +19,12 @@ const Post = ({post}) => {
    const [open,setOpen] = useState(false);
 
    const user = useSelector(store=>store.auth.user);
+   const all_posts = useSelector(store=>store.post.posts);     //this is all posts and above prop->post is about one post of many posts
+   
+   const dispatch = useDispatch();
+
+   const [liked,setLiked] = useState(post.likes?.includes(user._id) || false)
+   const [postlike,setPostLike] = useState(post.likes.length);
 
    const onChangeHandler=(e)=>{
       //put change value into const and check it is empty or not
@@ -28,6 +37,55 @@ const Post = ({post}) => {
          settext("")
       }
    }
+
+   const postDeleteHandler=async(e)=>{
+      e.preventDefault();
+      try {
+         const res = await axios.delete(`http://localhost:8000/api/v1/post/delete/${post?._id}`,{withCredentials:true})  // no header as we r not hosting
+         
+         if(res.data.success)
+         {
+            const updated_for_all_posts = all_posts.filter((each_post)=>each_post?._id !== post?._id) // put each post in again all_posts expect the post whose id i compare
+            dispatch(setPostUser(updated_for_all_posts));
+
+            toast.success(res.data.message);
+         }
+      } catch (error) {
+         console.log(error);
+        const errorMessage = error.response?.data?.message || "An error occurred while deleting the post.";
+        toast.error(errorMessage);
+      }
+   }
+
+   const postLikeHandler = async (e) => {
+      e.preventDefault();
+  
+      try {
+          const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/like_or_dislike`, { withCredentials: true });
+  
+          if (res.data.success) {
+              // Update UI based on the like/dislike action
+              setPostLike(prevLikes => liked ? prevLikes - 1 : prevLikes + 1);
+              setLiked(!liked);
+  
+              // Update likes in Redux
+              const updatedPosts = all_posts.map(a_post =>
+                  a_post._id === post._id
+                      ? { ...a_post, likes: liked ? a_post.likes.filter(id => id !== user._id) : [...a_post.likes, user._id] }
+                      : a_post
+              );
+  
+              dispatch(setPostUser(updatedPosts));
+  
+              toast.success(res.data.message);
+          }
+      } catch (error) {
+          console.error(error);
+          const errorMessage = error.response?.data?.message || "An error occurred while liking/disliking the post.";
+          toast.error(errorMessage);
+      }
+  };
+  
 
    return (
       <div className="my-8 w-full max-w-sm mx-auto">
@@ -49,7 +107,7 @@ const Post = ({post}) => {
                   <div className="flex flex-col items-center text-sm text-center">
                      <Button variant="ghost" className="cursor-pointer w-fit text-[#ED4956] font-bold">Unfollow</Button>
                      <Button variant="ghost" className="cursor-pointer w-fit ">Add to favourites</Button>
-                     {user && user._id === post.author._id && <Button variant="ghost" className="cursor-pointer w-fit ">Delete</Button>}
+                     {user   &&   user._id === post.author._id    &&    <Button variant="ghost"  onClick={postDeleteHandler}    className="cursor-pointer w-fit">Delete</Button>}
                   </div>
                </DialogContent>
             </Dialog>
@@ -64,7 +122,8 @@ const Post = ({post}) => {
 
          <div className="flex items-center justify-between my-2">
             <div className="flex items-center gap-3">
-               <FaRegHeart size="22px" className="cursor-pointer hover:text-gray-600"/>
+               { liked ? <FaHeart onClick={postLikeHandler} size="22px" className="cursor-pointer" /> :<FaRegHeart onClick={postLikeHandler} size="22px" className="cursor-pointer hover:text-gray-600"/>}
+               
                <MessageCircle onClick={()=>setOpen(true)} className="cursor-pointer hover:text-gray-600"/>
                <Send className="cursor-pointer hover:text-gray-600"/>
             </div>
@@ -72,7 +131,7 @@ const Post = ({post}) => {
          </div>
 
 
-         <span className="font-medium block mb-2">{post?.likes?.length || 0}  likes</span>
+         <span className="font-medium block mb-2">{postlike || 0}  likes</span>
          <p>
             <span className="font-medium mr-2">{post.author?.username}</span>
             {post.caption}

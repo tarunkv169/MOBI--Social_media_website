@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import Post from "./Post";
 
 const Posts = () => {
-  const { posts } = useSelector(store => store.post);
+  const posts  = useSelector(store => store.post.posts);
 
   return (
     <div>

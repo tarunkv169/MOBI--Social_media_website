@@ -13,7 +13,7 @@ const Commentdialog = ({ open, setOpen }) => {
 
    const onChangeHandler=(e)=>{
        const inputtext = e.target.value;
-       if(inputtext.trim())
+       if(inputtext.trim())              // as inputtext is not bool...so we apply inputtext.trim()-->not empty,,, !inputtext.trim()---->empty
        {
           setText(inputtext);
        }else{

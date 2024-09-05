@@ -7,7 +7,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
 
-const Commentdialog = ({ open, setOpen }) => {
+const Commentdialog = ({ open, setOpen, post }) => {
 
    const [text,setText] = useState("");
 
@@ -34,7 +34,7 @@ const Commentdialog = ({ open, setOpen }) => {
                <div className="w-1/2">
                     <img
                       className="w-full h-full object-cover rounded-l-lg"
-                      src="https://th.bing.com/th/id/OIP.92xngI7-q72ChW8r30bJqwHaEK?rs=1&pid=ImgDetMain"
+                      src={post.image}
                       alt="post_img"
                     />
               </div>
@@ -44,12 +44,12 @@ const Commentdialog = ({ open, setOpen }) => {
                               <div>
                                  <Link>
                                    <Avatar>
-                                      <AvatarImage src="https://github.com/shadcn.png" />
+                                      <AvatarImage src={post.author.profilePicture} />
                                       <AvatarFallback>CN</AvatarFallback>
                                    </Avatar>
                                  </Link>
                               </div>
-                                <Link><span className="font-semibold text-xs">Username</span></Link>
+                                <Link><span className="font-semibold text-xs">{post.author.username}</span></Link>
                           </div>
         
                           <div>
@@ -98,6 +98,7 @@ const Commentdialog = ({ open, setOpen }) => {
 Commentdialog.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
+  post: PropTypes.func.isRequired,
 };
 
 export default Commentdialog;

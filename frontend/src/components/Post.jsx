@@ -26,6 +26,8 @@ const Post = ({post}) => {
    const [liked,setLiked] = useState(post.likes?.includes(user._id) || false)
    const [postlike,setPostLike] = useState(post.likes.length);
 
+   const [comments,setComments] = useState(post.comments);
+
    const onChangeHandler=(e)=>{
       //put change value into const and check it is empty or not
       const inputtext =e.target.value;   
@@ -41,10 +43,13 @@ const Post = ({post}) => {
    const postDeleteHandler=async(e)=>{
       e.preventDefault();
       try {
+
+            //1️⃣ task:1 =>for dbs---->permanent storage
          const res = await axios.delete(`http://localhost:8000/api/v1/post/delete/${post?._id}`,{withCredentials:true})  // no header as we r not hosting
          
          if(res.data.success)
          {
+            //2️⃣ task:2 =>for reduxtoolkit---->to use it anywhere on UI
             const updated_for_all_posts = all_posts.filter((each_post)=>each_post?._id !== post?._id) // put each post in again all_posts expect the post whose id i compare
             dispatch(setPostUser(updated_for_all_posts));
 
@@ -61,30 +66,69 @@ const Post = ({post}) => {
       e.preventDefault();
   
       try {
-          const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/like_or_dislike`, { withCredentials: true });
+            //1️⃣ task:1 =>for dbs---->permanent storage
+                 const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/like_or_dislike`, { withCredentials: true });
   
-          if (res.data.success) {
-              // Update UI based on the like/dislike action
-              setPostLike(prevLikes => liked ? prevLikes - 1 : prevLikes + 1);
-              setLiked(!liked);
-  
-              // Update likes in Redux
-              const updatedPosts = all_posts.map(a_post =>
-                  a_post._id === post._id
-                      ? { ...a_post, likes: liked ? a_post.likes.filter(id => id !== user._id) : [...a_post.likes, user._id] }
-                      : a_post
-              );
-  
-              dispatch(setPostUser(updatedPosts));
-  
-              toast.success(res.data.message);
-          }
+                 if (res.data.success) {
+
+                     //3️⃣ task:3 =>for UI  or to continue component
+                          setPostLike(prevLikes => liked ? prevLikes - 1 : prevLikes + 1);
+                          setLiked(!liked);
+         
+                     //2️⃣ task:2 =>for reduxtoolkit---->to use it anywhere on UI
+                          const updated_Post_data = all_posts.map(p =>
+                              p._id === post._id
+                                  ? { ...p, likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id] }
+                                  : p
+                          );
+         
+                          dispatch(setPostUser(updated_Post_data));
+         
+                     toast.success(res.data.message);
+                 }
       } catch (error) {
           console.error(error);
           const errorMessage = error.response?.data?.message || "An error occurred while liking/disliking the post.";
           toast.error(errorMessage);
       }
   };
+
+
+  const commentAddHandler=async(e)=>{
+   e.preventDefault();
+  
+   try {
+         //1️⃣ task:1 =>for dbs---->permanent storage
+            const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`,{text},{
+               headers:{
+                  "Content-Type":"application/json"
+               },
+               withCredentials:true
+            })
+
+            if(res.data.success)
+            {
+               //2️⃣ task:2 =>for reduxtoolkit---->to use it anywhere on UI
+                    const update_comment_data = [...comments,res.data.comment];
+           
+                    const update_post_data = all_posts.map(p=>
+                       p._id === post._id 
+                       ? {...p, comments : update_comment_data} 
+                       : p
+                    )
+               
+                    dispatch(setPostUser(update_post_data));
+      
+               //3️⃣ task:3 =>for UI  or to continue component
+                    setComments(update_comment_data)
+      
+                    toast.success(res.data.message);
+            }
+   } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+   }
+  }
   
 
    return (
@@ -123,7 +167,6 @@ const Post = ({post}) => {
          <div className="flex items-center justify-between my-2">
             <div className="flex items-center gap-3">
                { liked ? <FaHeart onClick={postLikeHandler} size="22px" className="cursor-pointer" /> :<FaRegHeart onClick={postLikeHandler} size="22px" className="cursor-pointer hover:text-gray-600"/>}
-               
                <MessageCircle onClick={()=>setOpen(true)} className="cursor-pointer hover:text-gray-600"/>
                <Send className="cursor-pointer hover:text-gray-600"/>
             </div>
@@ -138,8 +181,8 @@ const Post = ({post}) => {
          </p>
 
 
-         <span  onClick={()=>setOpen(true)}  className="cursor-pointer text-sm text-gray-400">View all 10 comments</span>
-         <Commentdialog open={open} setOpen={setOpen}/>
+         <span  onClick={()=>setOpen(true)}  className="cursor-pointer text-sm text-gray-400">View all {comments.length} comments</span>
+         <Commentdialog open={open} setOpen={setOpen} post={post}/>
 
 
 
@@ -152,7 +195,7 @@ const Post = ({post}) => {
             onChange={onChangeHandler}
             />
             {
-               text && <span className="text-[#3BADF8]">Post</span>  // if there is text in comment box then only show Post button
+               text && <span className="cursor-pointer text-[#3BADF8]" onClick={commentAddHandler}>Post</span>  // if there is text in comment box then only show Post button
             }
          </div>
          

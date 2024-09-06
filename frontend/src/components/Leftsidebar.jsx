@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
+// import { setPostUser, setSelectedPost } from "@/redux/postSlice";
+// import { setAuthUser } from "@/redux/authSlice";
 
 
 const Leftsidebar = () => {
 
     const navigate = useNavigate();
-    
+    // const dispatch = useDispatch();
     // login of sidebarHandler
     const logoutHandler=async()=>{
         try {
@@ -19,6 +21,9 @@ const Leftsidebar = () => {
        
              if(res.data.success)
              {
+                // dispatch(setAuthUser(null));
+                // dispatch(setSelectedPost(null));
+                // dispatch(setPostUser([]));
                 navigate("/login")
                 toast.success(res.data.message);
              }

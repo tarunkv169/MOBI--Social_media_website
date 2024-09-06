@@ -9,7 +9,8 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import axios from "axios";
-import { setPostUser } from "@/redux/postSlice";
+import { setPostUser, setSelectedPost } from "@/redux/postSlice";
+import { Badge } from "./ui/badge";
 
 
 const Post = ({post}) => {
@@ -26,7 +27,7 @@ const Post = ({post}) => {
    const [liked,setLiked] = useState(post.likes?.includes(user._id) || false)
    const [postlike,setPostLike] = useState(post.likes.length);
 
-   const [comments,setComments] = useState(post.comments);
+   const [comment,setComment] = useState(post.comments);
 
    const onChangeHandler=(e)=>{
       //put change value into const and check it is empty or not
@@ -101,15 +102,17 @@ const Post = ({post}) => {
          //1️⃣ task:1 =>for dbs---->permanent storage
             const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`,{text},{
                headers:{
-                  "Content-Type":"application/json"
+                  'Content-Type':'application/json',
                },
                withCredentials:true
-            })
+            });
+            console.log(res.data);
 
             if(res.data.success)
             {
                //2️⃣ task:2 =>for reduxtoolkit---->to use it anywhere on UI
-                    const update_comment_data = [...comments,res.data.comment];
+                   console.log(res.data.comment)
+                    const update_comment_data = [...comment,res.data.comment];
            
                     const update_post_data = all_posts.map(p=>
                        p._id === post._id 
@@ -120,9 +123,10 @@ const Post = ({post}) => {
                     dispatch(setPostUser(update_post_data));
       
                //3️⃣ task:3 =>for UI  or to continue component
-                    setComments(update_comment_data)
+                    setComment(update_comment_data)
       
                     toast.success(res.data.message);
+                    settext("");
             }
    } catch (error) {
       console.log(error);
@@ -141,7 +145,11 @@ const Post = ({post}) => {
                      <AvatarImage src={post.author?.profilePicture} />
                      <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
-               <span>{post.author?.username}</span>
+                  <div className="flex items-center gap-2">
+                     <span>{post.author?.username}</span>
+                     { user?._id === post?.author?._id &&  <Badge>Author</Badge> }
+                  </div>
+               
             </div>
             <Dialog>
                <DialogTrigger>
@@ -167,7 +175,12 @@ const Post = ({post}) => {
          <div className="flex items-center justify-between my-2">
             <div className="flex items-center gap-3">
                { liked ? <FaHeart onClick={postLikeHandler} size="22px" className="cursor-pointer" /> :<FaRegHeart onClick={postLikeHandler} size="22px" className="cursor-pointer hover:text-gray-600"/>}
-               <MessageCircle onClick={()=>setOpen(true)} className="cursor-pointer hover:text-gray-600"/>
+
+               <MessageCircle onClick={()=>{
+                  setOpen(true);
+                  dispatch(setSelectedPost(post));
+                  }} className="cursor-pointer hover:text-gray-600"/>
+
                <Send className="cursor-pointer hover:text-gray-600"/>
             </div>
             <Bookmark className="cursor-pointer hover:text-gray-600"/>
@@ -180,9 +193,11 @@ const Post = ({post}) => {
             {post.caption}
          </p>
 
-
-         <span  onClick={()=>setOpen(true)}  className="cursor-pointer text-sm text-gray-400">View all {comments.length} comments</span>
-         <Commentdialog open={open} setOpen={setOpen} post={post}/>
+         {
+            comment.length>0 && <span  onClick={()=>setOpen(true)}  className="cursor-pointer text-sm text-gray-400">View all {comment.length} comments</span>
+         }
+         
+         <Commentdialog open={open} setOpen={setOpen}/>
 
 
 
@@ -216,7 +231,7 @@ const Post = ({post}) => {
 
 Post.propTypes = {
    
-   post: PropTypes.func.isRequired,
+   post: PropTypes.object.isRequired,
  };
  
 export default Post;

@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "./ui/dialog";
 import PropTypes from 'prop-types';
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
@@ -101,6 +101,7 @@ const CreatePost = ({ open, setOpen }) => {
     return (
         <div>
             <Dialog open={open} setOpen={setOpen}>
+                <DialogOverlay/>
                 <DialogContent onInteractOutside={() => setOpen(false)}>
                     <DialogTitle className="text-center font-semibold flex items-center border-b">
                         Create New Post

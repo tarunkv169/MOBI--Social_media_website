@@ -6,24 +6,21 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
-// import { setPostUser, setSelectedPost } from "@/redux/postSlice";
-// import { setAuthUser } from "@/redux/authSlice";
+
 
 
 const Leftsidebar = () => {
 
     const navigate = useNavigate();
-    // const dispatch = useDispatch();
-    // login of sidebarHandler
+    const [open,setOpen] = useState(false)
+    const user = useSelector((store)=>store.auth.user)
+
     const logoutHandler=async()=>{
         try {
              const res = await axios.get("http://localhost:8000/api/v1/user/logout",{withCredentials:true})
        
              if(res.data.success)
              {
-                // dispatch(setAuthUser(null));
-                // dispatch(setSelectedPost(null));
-                // dispatch(setPostUser([]));
                 navigate("/login")
                 toast.success(res.data.message);
              }
@@ -33,24 +30,25 @@ const Leftsidebar = () => {
           }
     }    
     
-    // Create of sidebarHandler
-    const [open,setOpen] = useState(false)
+
     const CreateHandler=()=>{
          setOpen(true);
     }
     
-    // onclick icon sidebarhandler
     const sidebarHandler=(text_type)=>{
          if(text_type==="Logout")
           {
              logoutHandler();
           }else if(text_type==="Create"){
              CreateHandler();
-          } 
+          }else if(text_type==="Profile"){
+             navigate(`/profile/${user._id}`)
+          }else if(text_type==="Home")
+          {
+            navigate('/');
+          }
     }
 
-    // picking up userDetails from store of redux-toolkit  
-    const user = useSelector((store)=>store.auth.user)  // either look 
     
     // arr of objs
      const sidebarItems = 

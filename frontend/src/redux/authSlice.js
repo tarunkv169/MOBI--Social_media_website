@@ -1,18 +1,28 @@
+// Redux slice (authSlice.js)
 import { createSlice } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
-    name:"auth",
-    initialState:{
-        user:null
+    name: "auth",
+    initialState: {
+        user: null,
+        suggestedUsers: [],
+        userProfile: null
     },
-    reducers:{
-         //actions
-         setAuthUser:(state,action)=>{
-            console.log("Action Payload:", action.payload); // Log the payload
-            state.user=action.payload
-         }
-    }
-})
+    reducers: {
+        // actions
+        setAuthUser: (state, action) => {
+            state.user = action.payload;
+        },
 
-export const {setAuthUser}=authSlice.actions;
+        setSuggestedUsers: (state, action) => {
+            state.suggestedUsers = action.payload;
+        },
+
+        setUserProfile: (state,action)=>{
+            state.userProfile = action.payload
+        }
+    }
+});
+
+export const { setAuthUser, setSuggestedUsers, setUserProfile } = authSlice.actions;
 export default authSlice.reducer;

@@ -19,7 +19,7 @@ const Rightsidebar = () => {
            </Link>
            <div>
              <h1 className='font-semibold text-sm'><Link to={`/profile/${user?._id}`}>{user?.username}</Link></h1>
-             <span className="text-gray-600 text-sm">{user?.bio || 'bio here....'}</span>
+             <span className="text-gray-600 text-sm w-fit">{user?.bio || 'bio here....'}</span>
            </div>
       </div>
 

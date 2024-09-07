@@ -7,7 +7,6 @@ import { Badge } from './ui/badge';
 
 const Comment = ({ comment }) => {
     
-    const {selectedPost} = useSelector(store=>store.post);
     const user = useSelector(store=>store.auth.user);
     return (
         <div className='my-1'>

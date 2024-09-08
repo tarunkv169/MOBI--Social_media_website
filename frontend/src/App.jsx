@@ -1,4 +1,5 @@
 import './App.css'
+import Chatpage from './components/Chatpage'
 import EditProfile from './components/EditProfile'
 import Home from './components/Home'
 
@@ -24,6 +25,10 @@ const browserRouter = createBrowserRouter([
       {
         path:`/account/edit`,
         element:<EditProfile/>     
+      },
+      {
+        path:`/chatpage`,
+        element:<Chatpage/>     
       }
     ]
   },

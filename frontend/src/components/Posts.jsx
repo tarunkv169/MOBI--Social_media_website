@@ -7,14 +7,7 @@ const Posts = () => {
   return (
     <div>
 
-      {posts && posts.length > 0 ? (
-        posts.map(post => (
-          // Safely access _id
-          post && post._id ? <Post key={post._id} post={post} /> : null
-        ))
-      ) : (
-        <p>No posts available</p>
-      )}
+      {posts && posts.length > 0 ? ( posts.map(post => (post && post._id ? <Post key={post._id} post={post} /> : null))) : ( <p>No posts available</p>)}
 
     </div>
   );

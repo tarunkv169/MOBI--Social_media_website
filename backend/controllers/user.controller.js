@@ -88,21 +88,16 @@ export const login=async(req,res)=>{
         // 3.. create an obj userdetail -->which to return as res for "viewProfile"
 
               // we r not getting post related to login user from anywhere.....so user.posts creds need to populate with posts
-              const populateposts = await Promise.all( 
-                    (user.posts || []).map(async(postId)=>
-                                            {
-                                                const posts = await Post.findById(postId);  //this give all and every post using Post Schema
-                                                // but we need only user's posts
-                                                if(posts.author.equals(user._id))
-                                                {
-                                                     return posts;
-                                                }
-                                                else{
-                                                    return null;
-                                                }
-                                                    
-                                            })
-                                                )
+              const populateposts = await Promise.all(
+                (user.posts || []).map(async (postId) => {
+                    const post = await Post.findById(postId); // Get the post
+                    if (post && post.author.equals(user._id)) { // Check if post exists and belongs to the user
+                        return post;
+                    } else {
+                        return null; // Return null if the post is not valid
+                    }
+                })
+            );
 
 
 
@@ -147,7 +142,7 @@ export const logout=async(req,res)=>{
 export const getprofile=async(req,res)=>{
     try {
         const userid = req.params.id;  //pick id
-        let user = await User.findById(userid).select("-password");  //user dbs without password
+        let user = await User.findById(userid).populate({path:'posts', createdAt:-1}).populate('bookmarks');  //user dbs without password
         if(!user)
         {
             return res.status(404).json({

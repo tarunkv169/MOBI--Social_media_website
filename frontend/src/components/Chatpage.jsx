@@ -6,21 +6,50 @@ import Messages from "./Messages";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useState } from "react";
+// import { toast } from "sonner";
+import axios from "axios";
+import { setMessages } from "@/redux/chatSlice";
 
 const Chatpage = () => {
   
   const user = useSelector(store=>store.auth.user);
   const suggestedUsers = useSelector(store=>store.auth.suggestedUsers);
   const selectedUser = useSelector(store=>store.auth.selectedUser);
+  const onlineUsers = useSelector(store=>store.chat.onlineUsers);
+  const messages = useSelector(store=>store.chat.messages);
 
   const dispatch = useDispatch();
 
   const [textMessage,setTextMessage]=useState("");
 
-  const sendMessageHandler=async(e)=>{
-    e.preventDefault();
+  const sendMessageHandler=async(recieverId)=>{
+    
+    console.log('this is begin of send')
+    try {
+      const res = await axios.post(`http://localhost:8000/api/v1/message/send/${recieverId}`,{textMessage},{
+        headers:{
+          'Content-Type':'application/json'
+        },
+        withCredentials:true
+      })
+
+      if(res.data.success)
+      {
+        console.log('hello')
+        console.log(res.data.newMsg)
+        
+        dispatch(setMessages([...messages,res.data.newMsg]));
+        setTextMessage("");
+        console.log('bye')
+      }
+    } catch (error) {
+      console.log(error);
+      // toast.error(error.response.data.message);
+    }
 
   }
+
+  
    
   return (
     <div className="flex ml-[16%] h-screen ">
@@ -38,7 +67,7 @@ const Chatpage = () => {
                           (
                             
                                suggestedUsers.map((suggUser)=>{
-                                   const isOnline = true;
+                                   const isOnline = onlineUsers.includes(suggUser?._id)
                                    return (
                                             <div key={suggUser._id} onClick={()=>dispatch(setSelectedUser(suggUser))} className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer">
                                                 <Avatar className="w-14 h-14">
@@ -89,7 +118,7 @@ const Chatpage = () => {
                       </div>
                 )
            }
-           
+            
     </div>
   )
 };

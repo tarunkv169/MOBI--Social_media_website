@@ -27,8 +27,8 @@ const CreatePost = ({ open, setOpen }) => {
     const [loading,setLoading] = useState(false);
 
     const dispatch = useDispatch();
-    const {posts} = useSelector(store=>store.post);  // need of {} as not default export
-    const {user}=useSelector(store=>store.auth);
+    const posts = useSelector(store=>store.post.posts);  // need of {} as not default export
+    const user=useSelector(store=>store.auth.user);
 
     const fileChangeHandler = async (e) => {
         e.preventDefault();

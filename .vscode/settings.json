@@ -1,0 +1,4 @@
+{
+    "vite.devCommand": "npm run dev",
+    "vite.vitepressAutoRouting": true
+}

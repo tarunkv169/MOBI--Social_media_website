@@ -14,7 +14,7 @@ router.route("/all").get(isAuthenticated,getallposts);
 router.route("/:id/like_or_dislike").get(isAuthenticated,like_or_dislike);
 router.route("/:id/comment").post(isAuthenticated,addcomment);
 router.route("/:id/comment/all").get(isAuthenticated,getcomments_ofpost);
-router.route("/delete/:id").post(isAuthenticated,deletepost);
+router.route("/delete/:id").delete(isAuthenticated,deletepost);          // need of delete
 router.route("/:id/bookmark").post(isAuthenticated,bookmark_post);
 
 export default router;

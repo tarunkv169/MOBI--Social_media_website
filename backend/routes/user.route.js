@@ -17,7 +17,7 @@ router.route("/:id/profile").get(isAuthenticated,getprofile);
 
 //for uploadation of file multer is use (we define multer storage in middlewares)
 //profile ko edit kr rhe hain to profile ke awge edit dala
-router.route("/profile/edit").post(isAuthenticated,upload.single("profilePicture"),editprofile);
+router.route("/profile/edit").post(isAuthenticated,upload.single("profilePhoto"),editprofile);
 router.route("/suggested_users").get(isAuthenticated,get_suggested_users);
 
 //:id is must---as in getprofile() we took user profile from "params id"

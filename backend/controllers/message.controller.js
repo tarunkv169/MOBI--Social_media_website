@@ -1,5 +1,6 @@
 import Conversation from "../models/conversation.model.js";// .js is must in import
 import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const sendMessage=async(req,res)=>{
     try {
@@ -8,7 +9,7 @@ export const sendMessage=async(req,res)=>{
             // retrieve msg schema creds
             const senderId = req.id;
             const recieverId = req.params.id;
-            const {message} = req.body;
+            const {textMessage:message} = req.body;
         
             // create a new message in dbs
             const newMsg = await Message.create({
@@ -35,6 +36,11 @@ export const sendMessage=async(req,res)=>{
     
         // PHASE3️⃣ Save both dbs
         await Promise.all( [ newMsg.save(), conversation.save() ] );
+
+        // get socketID and emit newMsg to that 
+        // for adding (this newMsg saved in dbs)--to--(allmsgs(for dbs & redux))
+        const recieverSocketId = getReceiverSocketId(recieverId);
+        io.to(recieverSocketId).emit("newMsg",newMsg);
     
         return res.status(200).json({
             success:true,
@@ -51,9 +57,9 @@ export const getMessage=async(req,res)=>{
         const senderId = req.id;
         const recieverId = req.params.id;
     
-        let conversation = await Conversation.find({
+        let conversation = await Conversation.findOne({
             participants:{$all:[senderId,recieverId]}
-        })
+        }).populate("messages");
     
         if(!conversation)   // if there is not any conver then we return with empty msgs...true
         {

@@ -12,6 +12,9 @@ import {
     REGISTER,
   } from 'redux-persist'
   import storage from 'redux-persist/lib/storage'
+import socketSlice from "./socketSlice";
+import chatSlice from "./chatSlice";
+import rtnSlice from "./rtnSlice";
 
 
   const persistConfig = {
@@ -23,7 +26,10 @@ import {
       //hey here
   const rootReducer = combineReducers({
       auth:authSlice,
-      post:postSlice
+      post:postSlice,
+      socketio:socketSlice,
+      chat:chatSlice,
+      realTimeNotification:rtnSlice
   })
       //bye
 

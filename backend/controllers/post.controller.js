@@ -113,95 +113,98 @@ export const getallposts=async(req,res)=>{
     }
 }
 
-export const like_or_dislike=async(req,res)=>{
+export const like_or_dislike = async (req, res) => {
     try {
         const who_like_dislike_id = req.id;
-       const post_id = req.params.id;
-   
-       const who_like_dislike_user = await User.findById(who_like_dislike_id);
-       const post = await Post.findById(post_id);
-       if(!post)
-       {
-          return res.status(404).json({
-            message:"Post not found",
-            success:false,
-          })
-       }
-   
-       //post ke "likes" mein--- who_like_dislike_id ---add or remove krenge
-   
-       const islike = await post.likes?.includes(who_like_dislike_id);
-   
-       if(islike)
-       {
-           //already like---so we click post for dislike(remove who_like_dislike_id) 
-           await post.updateOne({_id:post_id},{$pull:{likes: who_like_dislike_id}});
-           await post.save();
-   
-           return res.status(200).json({
-               message:"Post disliked",
-               success:true
-           })
-   
-       }else{
-           //not like---so we click for post for like(add who_like_dislike_id) only once(unique--need of set)
-           await post.updateOne({_id:post_id},{$addtoset:{likes: who_like_dislike_id}});
-           await post.save();
-   
-           return res.status(200).json({
-               message:"Post liked",
-               success:true
-           })
-    }
+        const post_id = req.params.id;
+
+        const post = await Post.findById(post_id);
+        if (!post) {
+            return res.status(404).json({
+                message: "Post not found",
+                success: false,
+            });
+        }
+
+        const isLike = post.likes.includes(who_like_dislike_id);
+        if (isLike) {
+            // User already liked the post, so we remove the like (dislike)
+            await post.updateOne({ $pull: { likes: who_like_dislike_id } });
+        } else {
+            // User hasn't liked the post yet, so we add the like
+            await post.updateOne({ $addToSet: { likes: who_like_dislike_id } });
+        }
+
+        return res.status(200).json({
+            message: isLike ? "Post disliked" : "Post liked",
+            success: true,
+        });
+
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({
+            message: "An error occurred while liking/disliking the post.",
+            success: false,
+        });
     }
+};
 
-}
 
-export const addcomment=async(req,res)=>{
+export const addcomment = async (req, res) => {
     try {
-             const who_comment_id = req.id;
-         const post_id = req.params.id;
-     
-         const who_comment_user = await User.findById(who_comment_id);
-         const post = await Post.findById(post_id);
-     
-         const {text} = req.body;
-     
-         if(!text)
-         {
+        const who_comment_id = req.id; // The user making the comment
+        const post_id = req.params.id; // The post being commented on
+
+        const post = await Post.findById(post_id);
+        const { text } = req.body;
+
+        if (!text) {
             return res.status(400).json({
-             message:"text is required",
-             success:false
-            })
-         }
-     
-         const comment = await Comment.create({
-             content:text,
-             commentedBy:who_comment_id,
-             commentedAt:post_id
-            }).populate({path:"author",select:'username,profilePicture'});
-     
-         post.comments.push(comment_id);
-         await post.save();
-     
-         return res.status(200).json({
-             message:"post is commented",
-             success:true,
-             comment
-         })
+                message: "Text is required",
+                success: false,
+            });
+        }
+
+        // Create the comment
+        const comment = await Comment.create({
+            content: text,
+            commentedBy: who_comment_id,
+            commentedAt: post_id,
+        });
+
+        // Populate the comment's 'commentedBy' field to include username and profilePicture
+        await comment.populate({
+            path: 'commentedBy',
+            select: 'username profilePicture'
+        }); // Make sure execPopulate is called to apply the population
+
+        // Add the comment to the post's comments array
+        post.comments.push(comment._id);
+        await post.save();
+
+        console.log(comment);
+        return res.status(201).json({
+            message: "Post is commented",
+            success: true,
+            comment, // This will now include the populated user data
+        });
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({
+            message: "An error occurred",
+            success: false,
+        });
     }
-}
+};
+
+
 
 
 export const getcomments_ofpost=async(req,res)=>{
     try {
         const post_id = req.params.id;
     
-        const comments_of_post = await Comment.find({createdAt:post_id}).populate({path:"author",select:'username,profilePicture'});
+        const comments_of_post = await Comment.find({createdAt:post_id}).populate({path:"author",select:'username profilePicture'});
     
         if(!comments_of_post)
         {
@@ -236,23 +239,29 @@ export const deletepost=async(req,res)=>{
     
         // user is auth to delete post
         const who_delete_id = req.id;
-        if(Post.author.toString() !== who_delete_id)
-        {
-            return res.status(404).json({
-                message:"User not authenticated",
-                success:false
-            })
-        }
+       if (!post.author || post.author.toString() !== who_delete_id) {
+           return res.status(403).json({
+               message: "User not authenticated",
+               success: false
+           });
+       }
+
     
         await Post.findByIdAndDelete(post_id);
 
     // 2️⃣delete post in user dbs
-        let who_delete_user = findById(who_delete_id);
+        let who_delete_user = await User.findById(who_delete_id); // Correct the call here
+        if (!who_delete_user) {
+            return res.status(404).json({
+                message: "User not found",
+                success: false
+            });
+        }
         who_delete_user.posts = await who_delete_user.posts.filter(id=>id.toString()!==post_id);
         await who_delete_user.save();
 
     // 3️⃣delete all post related comments from dbs
-        await Comment.deleteMany({createdAt:post_id})
+    await Comment.deleteMany({ post: post_id });
 
     return res.status(200).json({
         message:"Post deleted",
@@ -261,7 +270,7 @@ export const deletepost=async(req,res)=>{
 
     
    } catch (error) {
-     console.log({me})
+     console.log(error)
    }
 
 }

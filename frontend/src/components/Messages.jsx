@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -11,6 +12,14 @@ const Messages = ({ selectedUser }) => {
   useGetAllMessages();
   const messages = useSelector((store) => store.chat.messages);
   const user = useSelector((store) => store.auth.user);
+  const messagesEndRef = useRef(null); // Create a ref for the end of the messages
+
+  // Scroll to the bottom of the messages when new messages are added
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <div className="overflow-y-auto flex-1 p-4">
@@ -52,6 +61,8 @@ const Messages = ({ selectedUser }) => {
         ) : (
           <span>No messages yet</span>
         )}
+        {/* Add a div for scrolling */}
+        <div ref={messagesEndRef} />
       </div>
     </div>
   );
